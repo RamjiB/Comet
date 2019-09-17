@@ -10,16 +10,16 @@ from keras.optimizers import Adam,RMSprop
 train_path = 'train/'
 valid_path = 'valid/'
 test_csv_path = 'test_df.csv'
-prediction_csv = 'trail_1_prediction.csv'
+prediction_csv = 'trail_2_prediction.csv'
 
 IMG_SIZE = 128
 CHANNEL = 3
 ALPHA = 0.002
 OUTPUT_LAYER = 1
-CHECKPOINT = 'trail_1.h5'
-CSVFILE = 'trail_1.csv'
+CHECKPOINT = 'trail_2.h5'
+CSVFILE = 'trail_2.csv'
 BATCH_SIZE = 32
-EPOCHS = 100
+EPOCHS = 50
 LEARNING_RATE = 0.0001
 
 #read and store images along with its correcting labels
@@ -54,6 +54,10 @@ def read_images(path = train_path,mode = 'train'):
 x_train,y_train = read_images(train_path,'train')
 x_valid,y_valid = read_images(valid_path,'valid')
 
+#normalization
+x_train = x_train/255
+x_valid = x_valid/255
+
 print(x_valid.shape,x_train.shape,y_train.shape,y_valid.shape)
 
 #model creation
@@ -77,7 +81,7 @@ model.compile(optimizer = Adam(lr = LEARNING_RATE),loss='binary_crossentropy',me
 model.fit(x_train,y_train,batch_size = BATCH_SIZE,epochs=EPOCHS,validation_data = (x_valid,y_valid),verbose=1,callbacks = [checkpoint,csv,lr])
 
 #save the last model
-model.save_weights('train_1_' + str(EPOCHS) + '.h5')	
+model.save_weights('trail_2_' + str(EPOCHS) + '.h5')	
 
 print('------------------------------- model  trained ----------------------------')
 #TEST DATA
@@ -90,6 +94,9 @@ for i in test_df['img_path']:
 	img = cv2.resize(img,(128,128))
 	x_test.append(img)
 x_test = np.reshape(np.array(x_test),(len(x_test),IMG_SIZE,IMG_SIZE,CHANNEL))
+
+#normalization
+x_test = x_test/255
 
 y_test = test_df['class_name']
 print('------------- test data shape ----------------------')
