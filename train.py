@@ -1,12 +1,26 @@
 import os,glob,cv2
 import numpy as np
+import pandas as pd
+from keras.models import Sequential
+from keras.layers import Convolution2D,Activation,Dense,MaxPooling2D,Flatten,Dropout,LeakyReLU
+from keras.callbacks import ModelCheckpoint,CSVLogger,ReduceLROnPlateau
+from keras.optimizers import Adam,RMSprop
 
 #train and valid paths
 train_path = 'train/'
 valid_path = 'valid/'
+test_csv_path = 'test_df.csv'
+prediction_csv = 'trail_1_prediction.csv'
 
 IMG_SIZE = 128
 CHANNEL = 3
+ALPHA = 0.002
+OUTPUT_LAYER = 1
+CHECKPOINT = 'trail_1.h5'
+CSVFILE = 'trail_1.csv'
+BATCH_SIZE = 32
+EPOCHS = 100
+LEARNING_RATE = 0.0001
 
 #read and store images along with its correcting labels
 #damaged - 0, undamaged - 1
@@ -40,5 +54,54 @@ def read_images(path = train_path,mode = 'train'):
 x_train,y_train = read_images(train_path,'train')
 x_valid,y_valid = read_images(valid_path,'valid')
 
+print(x_valid.shape,x_train.shape,y_train.shape,y_valid.shape)
 
-print(x_train.shape,x_valid.shape,y_train.shape,y_valid.shape)		
+#model creation
+model = Sequential()
+model.add(Convolution2D(64,kernel_size=(3,3),padding = 'Same',input_shape=(IMG_SIZE,IMG_SIZE,CHANNEL)))
+model.add(LeakyReLU(alpha = ALPHA))
+model.add(Flatten())
+model.add(Dense(256,activation = 'relu'))
+# model.add(Dropout(0.3))
+model.add(Dense(OUTPUT_LAYER,activation = 'sigmoid'))
+
+model.summary()
+
+#callbacks
+
+checkpoint = ModelCheckpoint(CHECKPOINT,monitor = 'val_acc',save_best_only = True,verbose = 1)
+csv = CSVLogger(CSVFILE,separator = ",",append= True)
+lr = ReduceLROnPlateau(monitor = 'val_acc',factor = 0.1,patience = 2,verbose = 1,mode = 'max')
+
+model.compile(optimizer = Adam(lr = LEARNING_RATE),loss='binary_crossentropy',metrics = ['accuracy'])
+model.fit(x_train,y_train,batch_size = BATCH_SIZE,epochs=EPOCHS,validation_data = (x_valid,y_valid),verbose=1,callbacks = [checkpoint,csv,lr])
+
+#save the last model
+model.save_weights('train_1_' + str(EPOCHS) + '.h5')	
+
+print('------------------------------- model  trained ----------------------------')
+#TEST DATA
+
+#read test data
+test_df = pd.read_csv(test_csv_path)
+x_test = []
+for i in test_df['img_path']:
+	img = cv2.cvtColor(cv2.imread(i),cv2.COLOR_BGR2RGB)
+	img = cv2.resize(img,(128,128))
+	x_test.append(img)
+x_test = np.reshape(np.array(x_test),(len(x_test),IMG_SIZE,IMG_SIZE,CHANNEL))
+
+y_test = test_df['class_name']
+print('------------- test data shape ----------------------')
+print(x_test.shape,y_test.shape)
+
+#predictions
+prediction = model.predict_classes(x_test,batch_size= BATCH_SIZE,verbose = 1)
+
+print(prediction.shape)
+print('--------------------- prediction dataframe -----------------------------')
+df = pd.DataFrame(columns = ['img_path','predictions'])
+df['img_path'] = test_df['img_path']
+df['predictions'] = prediction
+
+df.to_csv(prediction_csv,index = False)
