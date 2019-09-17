@@ -13,7 +13,7 @@ CHANNEL = 3
 def read_images(path = train_path,mode = 'train'):
 	X = []
 	Y = []
-	class_names = os.lisdir(path)
+	class_names = os.listdir(path)
 	for cl in class_names:
 		img_paths = glob.glob(path+cl+'/*.png')
 		for img_path in img_paths:
@@ -40,5 +40,5 @@ def read_images(path = train_path,mode = 'train'):
 x_train,y_train = read_images(train_path,'train')
 x_valid,y_valid = read_images(valid_path,'valid')
 
-print(x_train.shape,y_train.shape,x_valid.shape,y_valid.shape)
-		
+
+print(x_train.shape,x_valid.shape,y_train.shape,y_valid.shape)		
