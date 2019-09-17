@@ -11,14 +11,14 @@ from sklearn.metrics import accuracy_score,confusion_matrix
 train_path = 'train/'
 valid_path = 'valid/'
 test_csv_path = 'csv/test_df.csv'
-prediction_csv = 'csv/trail_6_prediction.csv'
+prediction_csv = 'csv/trail_7_prediction.csv'
 
 IMG_SIZE = 128
 CHANNEL = 3
 ALPHA = 0.002
 OUTPUT_LAYER = 1
-CHECKPOINT = 'models/trail_6.h5'
-CSVFILE = 'csv/trail_6.csv'
+CHECKPOINT = 'models/trail_7.h5'
+CSVFILE = 'csv/trail_7.csv'
 BATCH_SIZE = 32
 EPOCHS = 15
 LEARNING_RATE = 0.0001
@@ -68,6 +68,9 @@ model.add(LeakyReLU(alpha = ALPHA))
 model.add(Convolution2D(64,kernel_size=(3,3),padding = 'Same'))
 model.add(LeakyReLU(alpha = ALPHA))
 model.add(MaxPooling2D((2,2),strides=None))
+model.add(Convolution2D(128,kernel_size=(3,3),padding = 'Same'))
+model.add(LeakyReLU(alpha = ALPHA))
+model.add(MaxPooling2D((2,2),strides=None))
 model.add(Flatten())
 model.add(Dense(256,activation = 'relu'))
 model.add(Dense(128,activation='relu'))
@@ -86,7 +89,7 @@ model.compile(optimizer = Adam(lr = LEARNING_RATE),loss='binary_crossentropy',me
 model.fit(x_train,y_train,batch_size = BATCH_SIZE,epochs=EPOCHS,validation_data = (x_valid,y_valid),verbose=1,callbacks = [checkpoint,csv,lr])
 
 #save the last model
-model.save_weights('models/trail_6_' + str(EPOCHS) + '.h5')	
+model.save_weights('models/trail_7_' + str(EPOCHS) + '.h5')	
 
 print('------------------------------- model  trained ----------------------------')
 #TEST DATA
