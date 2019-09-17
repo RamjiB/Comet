@@ -5,19 +5,20 @@ from keras.models import Sequential
 from keras.layers import Convolution2D,Activation,Dense,MaxPooling2D,Flatten,Dropout,LeakyReLU
 from keras.callbacks import ModelCheckpoint,CSVLogger,ReduceLROnPlateau
 from keras.optimizers import Adam,RMSprop
+from sklearn.metrics import accuracy_score,confusion_matrix
 
 #train and valid paths
 train_path = 'train/'
 valid_path = 'valid/'
-test_csv_path = 'test_df.csv'
-prediction_csv = 'trail_2_prediction.csv'
+test_csv_path = 'csv/test_df.csv'
+prediction_csv = 'csv/trail_3_prediction.csv'
 
 IMG_SIZE = 128
 CHANNEL = 3
 ALPHA = 0.002
 OUTPUT_LAYER = 1
-CHECKPOINT = 'trail_2.h5'
-CSVFILE = 'trail_2.csv'
+CHECKPOINT = 'models/trail_3.h5'
+CSVFILE = 'csv/trail_3.csv'
 BATCH_SIZE = 32
 EPOCHS = 50
 LEARNING_RATE = 0.0001
@@ -66,6 +67,7 @@ model.add(Convolution2D(64,kernel_size=(3,3),padding = 'Same',input_shape=(IMG_S
 model.add(LeakyReLU(alpha = ALPHA))
 model.add(Flatten())
 model.add(Dense(256,activation = 'relu'))
+model.add(Dense(128,activation='relu'))
 # model.add(Dropout(0.3))
 model.add(Dense(OUTPUT_LAYER,activation = 'sigmoid'))
 
@@ -81,7 +83,7 @@ model.compile(optimizer = Adam(lr = LEARNING_RATE),loss='binary_crossentropy',me
 model.fit(x_train,y_train,batch_size = BATCH_SIZE,epochs=EPOCHS,validation_data = (x_valid,y_valid),verbose=1,callbacks = [checkpoint,csv,lr])
 
 #save the last model
-model.save_weights('trail_2_' + str(EPOCHS) + '.h5')	
+model.save_weights('models/trail_3_' + str(EPOCHS) + '.h5')	
 
 print('------------------------------- model  trained ----------------------------')
 #TEST DATA
@@ -112,3 +114,7 @@ df['img_path'] = test_df['img_path']
 df['predictions'] = prediction
 
 df.to_csv(prediction_csv,index = False)
+
+print(accuracy_score(y_test,prediction))
+print(confusion_matrix(y_test,prediction))
+
