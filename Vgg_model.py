@@ -1,6 +1,6 @@
 import glob
 from keras.applications import inception_v3,mobilenet,vgg19,resnet50,xception,densenet
-from keras.layers import Conv2D,MaxPool2D,Dropout,Flatten,Dense
+from keras.layers import Dropout,Flatten,Dense
 from keras import models
 from keras.preprocessing.image import ImageDataGenerator
 
@@ -24,7 +24,7 @@ train_gen = datagen.flow_from_directory('train/' ,
                                        class_mode ='binary',
                                        shuffle = True)
 valid_gen = datagen.flow_from_directory('valid/' ,
-                                        target_size =(IMG_SIZE,IMG_SIZE) , 
+                                        target_size =(IMG_SIZE,IMG_SIZE) ,
                                         batch_size = BATCH_SIZE,
                                        class_mode ='binary',
                                        shuffle = True)
@@ -41,9 +41,8 @@ def pretrained_model(model):
         base_model = resnet50.ResNet50(include_top=False,weights='imagenet',input_shape = (IMG_SIZE,IMG_SIZE,3))
     elif model == 'xception':
         base_model = xception.Xception(include_top=False,weights='imagenet',input_shape = (IMG_SIZE,IMG_SIZE,3))
-        
     for layer in base_model.layers:
-        layer.trainable = True 
+        layer.trainable = True
     x = base_model.output
     x = Flatten()(x)
     x = Dense(150,activation='relu')(x)
