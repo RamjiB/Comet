@@ -1,6 +1,6 @@
 import glob
 from keras.applications import inception_v3,mobilenet,vgg19,resnet50,xception,densenet
-from keras.layers import Conv2D,MaxPool2D,Dropout,Flatten,Dense,
+from keras.layers import Conv2D,MaxPool2D,Dropout,Flatten,Dense
 from keras import models
 from keras.preprocessing.image import ImageDataGenerator
 
