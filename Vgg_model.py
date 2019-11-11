@@ -1,16 +1,11 @@
 import glob
-import keras
-from keras.applications import inception_v3,nasnet,mobilenet,vgg19,resnet50,xception,densenet
-import keras.backend as K
-
-from keras.models import Sequential
-from keras.layers import Conv2D,MaxPool2D,SeparableConv2D,Dropout,Flatten,Dense,BatchNormalization,GlobalAveragePooling2D
-from keras import layers,models
-from keras import initializers
+from keras.applications import inception_v3,mobilenet,vgg19,resnet50,xception,densenet
+from keras.layers import Conv2D,MaxPool2D,Dropout,Flatten,Dense,
+from keras import models
 from keras.preprocessing.image import ImageDataGenerator
 
 from keras.callbacks import ModelCheckpoint,ReduceLROnPlateau,CSVLogger
-from keras.optimizers import Adam,RMSprop
+from keras.optimizers import Adam
 
 total_train_images = len(glob.glob('train/damaged/*')) + len(glob.glob('train/undamaged/*'))
 total_valid_images = len(glob.glob('valid/damaged/*')) + len(glob.glob('valid/undamaged/*'))
@@ -23,12 +18,12 @@ datagen = ImageDataGenerator(rescale=1.0/255,
                 vertical_flip=True)
 
 #resizing all the images to 128 x 128
-train_gen = datagen.flow_from_directory('train/' , 
-                                        target_size = (IMG_SIZE,IMG_SIZE) , 
+train_gen = datagen.flow_from_directory('train/' ,
+                                        target_size = (IMG_SIZE,IMG_SIZE) ,
                                         batch_size = BATCH_SIZE,
                                        class_mode ='binary',
                                        shuffle = True)
-valid_gen = datagen.flow_from_directory('valid/' , 
+valid_gen = datagen.flow_from_directory('valid/' ,
                                         target_size =(IMG_SIZE,IMG_SIZE) , 
                                         batch_size = BATCH_SIZE,
                                        class_mode ='binary',
@@ -48,8 +43,7 @@ def pretrained_model(model):
         base_model = xception.Xception(include_top=False,weights='imagenet',input_shape = (IMG_SIZE,IMG_SIZE,3))
         
     for layer in base_model.layers:
-        layer.trainable = True
-        
+        layer.trainable = True 
     x = base_model.output
     x = Flatten()(x)
     x = Dense(150,activation='relu')(x)
@@ -80,7 +74,7 @@ callback = [checkpoint,learning_rate,csv_logger]
 steps_p_ep_tr = total_train_images//BATCH_SIZE
 steps_p_ep_va = total_valid_images//BATCH_SIZE
 
-main_model.compile(optimizer = Adam(lr=0.0001), 
+main_model.compile(optimizer = Adam(lr=0.0001),
               loss = 'binary_crossentropy', metrics=['accuracy'])
 
 my_model = main_model.fit_generator(train_gen,
