@@ -2,7 +2,7 @@ import os,glob,cv2
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
-from keras.layers import Convolution2D,Activation,Dense,MaxPooling2D,Flatten,LeakyReLU
+from keras.layers import Convolution2D,Dense,MaxPooling2D,Flatten,LeakyReLU
 from keras.callbacks import ModelCheckpoint,CSVLogger,ReduceLROnPlateau
 from keras.optimizers import Adam
 from sklearn.metrics import accuracy_score,confusion_matrix
