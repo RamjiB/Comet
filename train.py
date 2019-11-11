@@ -2,9 +2,9 @@ import os,glob,cv2
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
-from keras.layers import Convolution2D,Activation,Dense,MaxPooling2D,Flatten,Dropout,LeakyReLU
+from keras.layers import Convolution2D,Activation,Dense,MaxPooling2D,Flatten,LeakyReLU
 from keras.callbacks import ModelCheckpoint,CSVLogger,ReduceLROnPlateau
-from keras.optimizers import Adam,RMSprop
+from keras.optimizers import Adam
 from sklearn.metrics import accuracy_score,confusion_matrix
 
 #train and valid paths
@@ -87,7 +87,7 @@ model.compile(optimizer = Adam(lr = LEARNING_RATE),loss='binary_crossentropy',me
 model.fit(x_train,y_train,batch_size = BATCH_SIZE,epochs=EPOCHS,validation_data = (x_valid,y_valid),verbose=1,callbacks = [checkpoint,csv,lr])
 
 #save the last model
-model.save_weights('models/trail_11_' + str(EPOCHS) + '.h5')	
+model.save_weights('models/trail_11_' + str(EPOCHS) + '.h5')
 
 print('------------------------------- model  trained ----------------------------')
 #TEST DATA
